@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Cart;
+use App\Models\Item;
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get("/tes", function () {
+    $data = [
+        "users" => User::all(),
+        "items" => Item::all(),
+        "carts" => Cart::with("user", "cartItems")->get(),
+        "transactions" => Transaction::all(),
+    ];
+    return $data;
 });

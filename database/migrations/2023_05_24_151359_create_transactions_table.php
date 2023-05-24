@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string('nama');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('telepon');
-            $table->text('alamat');
-            $table->rememberToken();
+            $table->uuid("user_id");
+            $table->uuid("keranjang_id");
+            $table->string("status")->default("pending");
+            $table->bigInteger("total_biaya");
+            $table->string("bank");
             $table->timestamps();
+            $table->foreign("user_id")->references("id")->on("users");
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('transactions');
     }
 };
