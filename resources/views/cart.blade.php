@@ -53,6 +53,15 @@
                     <td>Rp. {{ number_format($cartItem->total_harga, 2, ',', '.') }}</td>
                   </tr>
                   @endforeach
+                  <tr>
+                    <td colspan="5" class="total-amount">
+                      <h6 class="m-0 text-end"><span class="f-w-600">Total Price :</span></h6>
+                    </td>
+                    <td><span>Rp. {{ number_format($cart->total_biaya, 2, ',', '.') }}</span></td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-end"><a class="btn btn-success cart-btn-transform" href="checkout.html">check out</a></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
