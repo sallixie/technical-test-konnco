@@ -39,6 +39,11 @@
                   </tr>
                 </thead>
                 <tbody>
+                  @if(!$cart)
+                    <tr>
+                      <td colspan="6" class="text-center">Tidak ada item di cart</td>
+                    </tr>
+                  @else
                   @foreach ($cart->cartItems as $cartItem)
                   <tr>
                     <td><img class="img-fluid img-40" src="{{ asset("storage/items/" . $cartItem->item->gambar) }}" alt="{{ $cartItem->item->nama }}"></td>
@@ -62,6 +67,7 @@
                   <tr>
                     <td colspan="6" class="text-end"><a class="btn btn-success cart-btn-transform" href="/checkout">check out</a></td>
                   </tr>
+                  @endif
                 </tbody>
               </table>
             </div>

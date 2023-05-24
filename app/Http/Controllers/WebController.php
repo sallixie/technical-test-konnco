@@ -16,7 +16,7 @@ class WebController extends Controller
 {
     public function dashboard()
     {
-        return view("checkout-payment");
+        return view("dashboard");
     }
 
     public function login()
@@ -89,7 +89,7 @@ class WebController extends Controller
             ]);
 
             $serverKey = config("midtrans.key");
-            $response = Http::withBasicAuth($serverKey, '')
+            $midtrans = Http::withBasicAuth($serverKey, '')
                 ->post("https://api.sandbox.midtrans.com/v2/charge", [
                     "payment_type" => "bank_transfer",
                     "transaction_details" => [
@@ -106,13 +106,13 @@ class WebController extends Controller
                     ],
                 ]);
 
-            if ($response->failed()) {
+            if ($midtrans->failed()) {
                 throw new \Exception("Midtrans error");
             }
 
             DB::commit();
 
-            return view("checkout-payment", compact("response"));
+            return view("checkout-payment", compact("midtrans", "cart"));
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with("error", "Gagal melakukan pembayaran");
