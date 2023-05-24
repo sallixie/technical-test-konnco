@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\WebController;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Item;
 use App\Models\Transaction;
 use App\Models\User;
@@ -21,12 +23,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/shop', [WebController::class, 'shop'])->name('shop');
+Route::get('/cart', [WebController::class, 'cart'])->name('cart');
+
 Route::get("/tes", function () {
     $data = [
         "users" => User::all(),
         "items" => Item::all(),
         "carts" => Cart::with("user", "cartItems")->get(),
         "transactions" => Transaction::all(),
+        "cart_items" => CartItem::all(),
     ];
     return $data;
 });

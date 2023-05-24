@@ -17,8 +17,6 @@ return new class extends Migration
             $table->uuid("item_id");
             $table->integer("jumlah_item");
             $table->timestamps();
-            $table->foreign("cart_id")->references("id")->on("carts");
-            $table->foreign("item_id")->references("id")->on("items");
         });
     }
 

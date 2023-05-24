@@ -19,7 +19,6 @@ return new class extends Migration
             $table->bigInteger("total_biaya");
             $table->string("bank");
             $table->timestamps();
-            $table->foreign("user_id")->references("id")->on("users");
         });
     }
 

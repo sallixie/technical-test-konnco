@@ -67,9 +67,9 @@
                   <li class="back-btn">
                     <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                   </li>
-                  <li><a class="nav-link menu-title link-nav" href="#"><i data-feather="home"></i><span>Dashboard</span></a></li>
-                  <li><a class="nav-link menu-title link-nav" href="#"><i data-feather="shopping-bag"></i><span>Shop</span></a>
-                  <li><a class="nav-link menu-title link-nav" href="#"><i data-feather="shopping-cart"></i><span>Cart</span></a>
+                  <li><a class="nav-link menu-title link-nav" href="/dashboard"><i data-feather="home"></i><span>Dashboard</span></a></li>
+                  <li><a class="nav-link menu-title link-nav" href="/shop"><i data-feather="shopping-bag"></i><span>Shop</span></a>
+                  <li><a class="nav-link menu-title link-nav" href="/cart"><i data-feather="shopping-cart"></i><span>Cart</span></a>
                 </ul>
               </div>
             </div>
