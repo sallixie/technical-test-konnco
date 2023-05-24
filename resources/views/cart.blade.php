@@ -8,7 +8,7 @@
         <div class="page-header-left">
           <h3>Cart</h3>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
             <li class="breadcrumb-item active">Cart</li>
           </ol>
         </div>
@@ -60,7 +60,7 @@
                     <td><span>Rp. {{ number_format($cart->total_biaya, 2, ',', '.') }}</span></td>
                   </tr>
                   <tr>
-                    <td colspan="6" class="text-end"><a class="btn btn-success cart-btn-transform" href="checkout.html">check out</a></td>
+                    <td colspan="6" class="text-end"><a class="btn btn-success cart-btn-transform" href="/checkout">check out</a></td>
                   </tr>
                 </tbody>
               </table>

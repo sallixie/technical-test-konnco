@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use \Illuminate\Support\Str;
 
 class ApiController extends Controller
@@ -69,5 +73,88 @@ class ApiController extends Controller
             'status' => 'success',
             'message' => 'Berhasil menambahkan item ke cart',
         ]);
+    }
+
+    public function checkout(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "user_id" => 'required',
+            "keranjang_id" => 'required',
+            "bank" => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "invalid entry", "data" => $validator->errors()]);
+        }
+
+        $keranjang = Cart::with("user", "barang_keranjang")
+            ->find($request->keranjang_id)
+            ->first();
+
+        if (!$keranjang) {
+            return response()->json(["message" => "keranjang not found"], 404);
+        }
+
+        try {
+            $order_id = Str::uuid()->toString();
+            DB::beginTransaction();
+
+            DB::table("transaksis")->insert([
+                "id" => $order_id,
+                "user_id" => $request->user_id,
+                "keranjang_id" => $request->keranjang_id,
+                "total_biaya" => $keranjang->total_biaya,
+                "status" => "pending",
+                "created_at" => Carbon::now(),
+            ]);
+
+            $serverKey = config("midtrans.key");
+            $response = Http::withBasicAuth($serverKey, '')
+                ->post("https://api.sandbox.midtrans.com/v2/charge", [
+                    "payment_type" => "bank_transfer",
+                    "transaction_details" => [
+                        "order_id" => $order_id,
+                        "gross_amount" => $keranjang->total_biaya + 100000000
+                    ],
+                    "bank_transfer" => [
+                        "bank" => "bni"
+                    ],
+                    "customer_details" => [
+                        "first_name" => $keranjang->user->name,
+                        "email" => $keranjang->user->email,
+                    ],
+                    "description" => "Pembayaran untuk " . $keranjang->user->name,
+                ]);
+
+            if ($response->failed()) {
+                throw new \Exception($response->json()["message"]);
+            }
+
+            DB::commit();
+            return response()->json(["message" => "success", "data" => $response->json()]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(["message" => $e->getMessage()], 500);
+        }
+    }
+
+    public function webhook(Request $request)
+    {
+        Log::info("webhook", $request->all());
+        $signature = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . config("midtrans.key"));
+
+        if ($signature !== $request->signature_key) {
+            return response()->json(["message" => "invalid signature"], 400);
+        }
+
+        DB::beginTransaction();
+
+        DB::table("transaksis")
+            ->where("id", $request->order_id)
+            ->update([
+                "status" => $request->transaction_status
+            ]);
+
+        DB::commit();
     }
 }

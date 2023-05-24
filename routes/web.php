@@ -19,14 +19,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::get('/login', [WebController::class, 'login'])->name('login');
 Route::post('/login', [WebController::class, 'loginAuth'])->name('login');
-Route::get('/shop', [WebController::class, 'shop'])->name('shop');
-Route::get('/cart', [WebController::class, 'cart'])->name('cart');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return redirect('/dashboard');
+    });
+    Route::get('/dashboard', [WebController::class, 'dashboard'])->name('dashboard');
+    Route::get('/shop', [WebController::class, 'shop'])->name('shop');
+    Route::get('/cart', [WebController::class, 'cart'])->name('cart');
+    Route::get('/checkout', [WebController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout/payment', [WebController::class, 'checkoutPayment'])->name('checkoutPayment');
+});
+
 
 Route::get("/tes", function () {
     $data = [

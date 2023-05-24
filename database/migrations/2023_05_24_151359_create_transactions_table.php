@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->uuid("user_id");
-            $table->uuid("keranjang_id");
+            $table->uuid("cart_id");
             $table->string("status")->default("pending");
             $table->bigInteger("total_biaya");
             $table->string("bank");
