@@ -1,8 +1,8 @@
 $(document).ready(function () {
     $(".btn-add-to-cart").on("click", function () {
         swal({
-            title: "Are you sure?",
-            text: "You want to add this product to cart?",
+            title: "Apa anda yakin?",
+            text: "Anda akan menambahkan barang ini ke keranjang?",
             icon: "info",
             buttons: true,
             buttons: ["No", "Yes"],
@@ -24,16 +24,16 @@ $(document).ready(function () {
                 }).done(function (response) {
                     if (response.status == "success") {
                         swal({
-                            title: "Success!",
-                            text: "You have added this product to cart!",
+                            title: "Berhasil!",
+                            text: "Kamu telah menambahkan barang ke keranjang!",
                             icon: "success",
                             button: "OK",
                         });
                         $("#modal-detail").modal("hide");
                     } else {
                         swal({
-                            title: "Failed!",
-                            text: "You have failed to add this product to cart!",
+                            title: "Gagal!",
+                            text: "Kamu gagal menambahkan barang ke keranjang!",
                             icon: "error",
                             button: "OK",
                         });

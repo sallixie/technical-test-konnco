@@ -23,6 +23,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/login', [WebController::class, 'login'])->name('login');
+Route::post('/login', [WebController::class, 'loginAuth'])->name('login');
 Route::get('/shop', [WebController::class, 'shop'])->name('shop');
 Route::get('/cart', [WebController::class, 'cart'])->name('cart');
 

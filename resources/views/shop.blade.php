@@ -52,7 +52,7 @@
                                 <input class="touchspin text-center quantity" type="number" value="1" max="{{ $item->stok }}">
                               </div>
                             </fieldset>
-                            <div class="addcart-btn"><button class="btn btn-primary w-100 btn-add-to-cart" type="button" data-id={{ $item->id }} data-user="1ac1454d-bba6-482d-b576-034ce16f1c50">Add to Cart</button></div>
+                            <div class="addcart-btn"><button class="btn btn-primary w-100 btn-add-to-cart" type="button" data-id={{ $item->id }} data-user="{{ Auth::user()->id }}">Add to Cart</button></div>
                           </div>
                         </div>
                       </div>
@@ -79,8 +79,6 @@
 @endsection
 
 @section('script')
-
   <script src="{{ asset('assets/js/sweet-alert/sweetalert.min.js') }}"></script>
-  <script src="{{ asset('assets/js/sweet-alert/app.js') }}"></script>
   <script src="{{ asset('assets/js/custom/add-to-cart.js') }}"></script>
 @endsection

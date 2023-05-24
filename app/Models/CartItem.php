@@ -10,9 +10,20 @@ class CartItem extends Model
 {
     use HasFactory, HasUuids;
     protected $guarded = ["id"];
+    protected $append = ["total_harga"];
 
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
+    }
+
+    public function getTotalHargaAttribute()
+    {
+        return $this->item->harga * $this->jumlah_item;
     }
 }
