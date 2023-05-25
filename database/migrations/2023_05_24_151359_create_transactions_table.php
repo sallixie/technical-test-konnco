@@ -17,6 +17,10 @@ return new class extends Migration
             $table->uuid("cart_id");
             $table->string("status")->default("pending");
             $table->bigInteger("total_biaya");
+            $table->string("va_number")->nullable();
+            $table->string("bill_key")->nullable();
+            $table->string("biller_code")->nullable();
+            $table->datetime("expiry_time")->nullable();
             $table->string("bank");
             $table->timestamps();
         });

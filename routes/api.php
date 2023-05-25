@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/cart/add', [ApiController::class, 'addToCart']);
+Route::post('/webhook/midtrans', [ApiController::class, 'webhook']);
 
-Route::get("uuid", function () {
-    return \Illuminate\Support\Str::uuid()->toString();
-});
+Route::get("/transaction-status/{transaction}", [ApiController::class, 'transactionStatus']);

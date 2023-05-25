@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [WebController::class, 'dashboard'])->name('dashboard');
     Route::get('/shop', [WebController::class, 'shop'])->name('shop');
     Route::get('/cart', [WebController::class, 'cart'])->name('cart');
+    Route::delete('/cart/delete/{cartItem}', [WebController::class, 'cartDelete'])->name('cartDelete');
     Route::get('/checkout', [WebController::class, 'checkout'])->name('checkout');
     Route::post('/checkout/payment', [WebController::class, 'checkoutPayment'])->name('checkoutPayment');
 });

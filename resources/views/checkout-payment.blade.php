@@ -24,12 +24,13 @@
               <div>
                 <div class="row invo-header text-center">
                   <div class="col-md-12 col-sm-12">
-                    <div class="badge badge-warning">Pending</div>
+                    <div class="badge badge-warning" id="badge_status">Pending</div>
                   </div>
-                  <h5>{{ strtoupper($midtrans["va_numbers"][0]["bank"]) }} Virtual Account Billing</h5>
-                  <h2>{{ $midtrans["va_numbers"][0]["va_number"] }}</h2>
+                  <h5>{{ strtoupper($bank === "echannel" ? "Mandiri" : $bank ) }} Virtual Account Billing</h5>
+                  <input type="hidden" id="transaction_id" value="{{ $transaction_id }}">
+                  <h2>{{ $va_number ? $va_number : 'Bill Key : ' . $bill_key . " | Biller Code : " . $biller_code }}</h2>
                   <small class="text-secondary">Expire pada {{ 
-                    date('d F Y H:i:s', strtotime($midtrans["expiry_time"]))
+                    date('d F Y H:i:s', strtotime($expiry_time))
                   }}</small>
                 </div>
               </div>
@@ -102,7 +103,7 @@
                 <div class="row mt-3">
                   <div class="col-md-12">
                     <div>
-                      <p class="legal"><strong>Thank you for your business!</strong>  Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices.</p>
+                      <p class="legal"><strong>Terima kasih telah berbelanja!</strong>  Silakan melakukan pembayaran segera.</p>
                     </div>
                   </div>
                 </div>
@@ -118,5 +119,9 @@
   </div>
   <!-- Container-fluid Ends-->
 </div>
+@endsection
 
+@section('script')
+<script src="{{ asset('assets/js/sweet-alert/sweetalert.min.js') }}"></script>
+<script src="{{ asset('assets/js/custom/get-transaction-status.js') }}"></script>
 @endsection

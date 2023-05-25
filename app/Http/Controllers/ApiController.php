@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -144,17 +145,35 @@ class ApiController extends Controller
         $signature = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . config("midtrans.key"));
 
         if ($signature !== $request->signature_key) {
-            return response()->json(["message" => "invalid signature"], 400);
+            return response()->json(["status" => "error", "message" => "invalid signature"], 400);
         }
 
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        DB::table("transaksis")
-            ->where("id", $request->order_id)
-            ->update([
-                "status" => $request->transaction_status
-            ]);
+            DB::table("transactions")
+                ->where("id", $request->order_id)
+                ->update([
+                    "status" => $request->transaction_status
+                ]);
 
-        DB::commit();
+            DB::table("carts")
+                ->where("status", "pending")
+                ->update([
+                    "status" => $request->transaction_status
+                ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(["status" => "error", "message" => $e->getMessage()], 500);
+        }
+
+        return response()->json(["status" => "success", "message" => "success update transaction status"]);
+    }
+
+    public function transactionStatus(Transaction $transaction)
+    {
+        return $transaction->status === "pending" ? "Pending" : response()->json($transaction->status === "settlement" ? "Success" : "Failed");
     }
 }

@@ -54,7 +54,13 @@
                     <td>
                       {{ $cartItem->jumlah_item }}
                     </td>
-                    <td><i data-feather="x-circle"></i></td>
+                    <td>
+                      <form action="/cart/delete/{{ $cartItem->id }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-link btn-delete-cart" type="button"><i data-feather="x-circle"></i></button>
+                      </form>
+                    </td>
                     <td>Rp. {{ number_format($cartItem->total_harga, 2, ',', '.') }}</td>
                   </tr>
                   @endforeach
@@ -78,4 +84,15 @@
   </div>
 </div>
 
+@endsection
+
+@section('script')
+<script src="{{ asset('assets/js/sweet-alert/sweetalert.min.js') }}"></script>
+<script src="{{ asset('assets/js/custom/delete-cart.js') }}"></script>
+
+@if(session('success'))
+<script>
+  swal("Berhasil!", "{{ session('success') }}", "success");
+</script>
+@endif
 @endsection

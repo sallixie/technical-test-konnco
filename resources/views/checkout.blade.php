@@ -83,7 +83,7 @@
                         <input class="radio_animated" id="bank4" type="radio" name="bank" value="echannel">Mandiri Bill Payment
                       </label>
                       <label class="d-block" for="bank5">
-                        <input class="radio_animated" id="bank5" type="radio" name="bank" value="permata">Permata Virtual Account
+                        {{-- <input class="radio_animated" id="bank5" type="radio" name="bank" value="permata" disabled>Permata Virtual Account --}}
                       </label>
                     </div>
                   </div>

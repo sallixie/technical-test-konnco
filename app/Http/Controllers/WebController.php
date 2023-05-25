@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Item;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -58,6 +59,12 @@ class WebController extends Controller
         return view("cart", compact("cart"));
     }
 
+    public function cartDelete(CartItem $cartItem)
+    {
+        $cartItem->delete();
+        return redirect()->back()->with("success", "Berhasil menghapus item dari keranjang");
+    }
+
     public function checkout()
     {
         $cart = Cart::with("user", "cartItems")
@@ -77,6 +84,64 @@ class WebController extends Controller
             $order_id = Str::uuid()->toString();
             DB::beginTransaction();
 
+            $serverKey = config("midtrans.key");
+
+            if ($request->bank === "echannel") {
+                $midtrans = Http::withBasicAuth($serverKey, '')
+                    ->post("https://api.sandbox.midtrans.com/v2/charge", [
+                        "payment_type" => "echannel",
+                        "transaction_details" => [
+                            "order_id" => $order_id,
+                            "gross_amount" => $cart->total_biaya
+                        ],
+                        "echannel" => [
+                            "bill_info1" => "Payment For:",
+                            "bill_info2" => "Order ID: " . $order_id,
+                        ],
+                        "customer_details" => [
+                            "first_name" => Auth::user()->name,
+                            "email" => Auth::user()->email,
+                            "phone" => Auth::user()->telepon,
+                        ],
+                    ]);
+                $bill_key = $midtrans["bill_key"];
+                $biller_code = $midtrans["biller_code"];
+            } else if ($request->bank === "permata") {
+                $midtrans = Http::withBasicAuth($serverKey, '')
+                    ->post("https://api.sandbox.midtrans.com/v2/charge", [
+                        "payment_type" => "permata",
+                        "transaction_details" => [
+                            "order_id" => $order_id,
+                            "gross_amount" => $cart->total_biaya
+                        ],
+                    ]);
+                $va_number = $midtrans["permata_va_number"];
+                $expiry_time = $midtrans["permata_expiration"];
+            } else {
+                $midtrans = Http::withBasicAuth($serverKey, '')
+                    ->post("https://api.sandbox.midtrans.com/v2/charge", [
+                        "payment_type" => "bank_transfer",
+                        "transaction_details" => [
+                            "order_id" => $order_id,
+                            "gross_amount" => $cart->total_biaya
+                        ],
+                        "bank_transfer" => [
+                            "bank" => $request->bank,
+                        ],
+                        "customer_details" => [
+                            "first_name" => Auth::user()->name,
+                            "email" => Auth::user()->email,
+                            "phone" => Auth::user()->telepon,
+                        ],
+                    ]);
+                $va_number = $midtrans["va_numbers"][0]["va_number"];
+                $expiry_time = $midtrans["expiry_time"];
+            }
+
+            if ($midtrans->failed()) {
+                throw new \Exception("Midtrans error");
+            }
+
             DB::table("transactions")->insert([
                 "id" => $order_id,
                 "user_id" => Auth::user()->id,
@@ -84,35 +149,22 @@ class WebController extends Controller
                 "total_biaya" => $cart->total_biaya,
                 "bank" => $request->bank,
                 "status" => "pending",
+                "va_number" => $va_number ?? null,
+                "bill_key" => $bill_key ?? null,
+                "biller_code" => $biller_code ?? null,
+                "expiry_time" => $expiry_time ?? null,
                 "created_at" => Carbon::now(),
                 "updated_at" => Carbon::now(),
             ]);
 
-            $serverKey = config("midtrans.key");
-            $midtrans = Http::withBasicAuth($serverKey, '')
-                ->post("https://api.sandbox.midtrans.com/v2/charge", [
-                    "payment_type" => "bank_transfer",
-                    "transaction_details" => [
-                        "order_id" => $order_id,
-                        "gross_amount" => $cart->total_biaya
-                    ],
-                    "bank_transfer" => [
-                        "bank" => "bni"
-                    ],
-                    "customer_details" => [
-                        "first_name" => Auth::user()->name,
-                        "email" => Auth::user()->email,
-                        "phone" => Auth::user()->telepon,
-                    ],
-                ]);
-
-            if ($midtrans->failed()) {
-                throw new \Exception("Midtrans error");
-            }
-
             DB::commit();
-
-            return view("checkout-payment", compact("midtrans", "cart"));
+            $bank = $request->bank;
+            $bill_key = $bill_key ?? null;
+            $biller_code = $biller_code ?? null;
+            $va_number = $va_number ?? null;
+            $expiry_time = $expiry_time ?? null;
+            $transaction_id = $order_id;
+            return view("checkout-payment", compact("va_number", "expiry_time", "cart", "bill_key", "biller_code", "bank", "transaction_id"));
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with("error", "Gagal melakukan pembayaran");
