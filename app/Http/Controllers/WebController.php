@@ -56,6 +56,7 @@ class WebController extends Controller
             ->where("user_id", auth()->user()->id)
             ->where("status", "pending")
             ->first();
+
         return view("cart", compact("cart"));
     }
 
@@ -80,6 +81,12 @@ class WebController extends Controller
             $cart = Cart::with("user", "cartItems")
                 ->find($request->cart_id)
                 ->first();
+            foreach ($cart->cartItems as $cartItem) {
+                $item = Item::find($cartItem->item_id);
+                if ($item->stok < $cartItem->jumlah_item) {
+                    return redirect()->back()->with("error", "Stok " . $item->nama . " tidak cukup");
+                }
+            }
 
             $order_id = Str::uuid()->toString();
             DB::beginTransaction();
@@ -157,7 +164,15 @@ class WebController extends Controller
                 "updated_at" => Carbon::now(),
             ]);
 
+            foreach ($cart->cartItems as $cartItem) {
+                $item = DB::table("items")->where("id", $cartItem->item_id);
+                $item->update([
+                    "stok" => DB::raw("stok - $cartItem->jumlah_item")
+                ]);
+            }
+
             DB::commit();
+
             $bank = $request->bank;
             $bill_key = $bill_key ?? null;
             $biller_code = $biller_code ?? null;

@@ -25,9 +25,8 @@ Route::post('/login', [WebController::class, 'loginAuth'])->name('login');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
-        return redirect('/dashboard');
+        return redirect('/shop');
     });
-    Route::get('/dashboard', [WebController::class, 'dashboard'])->name('dashboard');
     Route::get('/shop', [WebController::class, 'shop'])->name('shop');
     Route::get('/cart', [WebController::class, 'cart'])->name('cart');
     Route::delete('/cart/delete/{cartItem}', [WebController::class, 'cartDelete'])->name('cartDelete');

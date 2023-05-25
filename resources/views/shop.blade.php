@@ -50,6 +50,7 @@
                             <fieldset>
                               <div class="input-group">
                                 <input class="touchspin text-center quantity" type="number" value="1" max="{{ $item->stok }}">
+                                <small class="text-secondary">Stok : {{ $item->stok }}</small>
                               </div>
                             </fieldset>
                             <div class="addcart-btn"><button class="btn btn-primary w-100 btn-add-to-cart" type="button" data-id={{ $item->id }} data-user="{{ Auth::user()->id }}">Add to Cart</button></div>

@@ -19,6 +19,18 @@ class ApiController extends Controller
         try {
             DB::beginTransaction();
 
+            $stokReady = DB::table('items')
+                ->where('id', $request->item_id)
+                ->where('stok', '>=', $request->jumlah_item)
+                ->first();
+
+            if (!$stokReady) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Stok tidak cukup',
+                ]);
+            }
+
             $cartAvailable = DB::table('carts')
                 ->where('user_id', $request->user_id)
                 ->where('status', "pending")
